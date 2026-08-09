@@ -45,22 +45,14 @@ let musicStarted = false;
 document.addEventListener('click', function initMusic() {
 const bgMusic = document.getElementById('bgMusic');
 if (!musicStarted && bgMusic.src) {
-// 等待音频准备好后再播放
 bgMusic.play().then(() => {
 musicStarted = true;
 console.log('🎵 音乐已启动');
 }).catch(() => {
-// 如果失败，尝试重新加载再播放
-bgMusic.load();
-bgMusic.play().then(() => {
-musicStarted = true;
-console.log('🎵 音乐已启动（重试成功）');
-}).catch(err => {
-console.log('❌ 音乐启动失败:', err);
-});
+console.log('⏳ 音频未准备好，等待下次点击');
 });
 }
-}, { once: true });
+});
 
 // ========== 点击音效（用 Web Audio API 生成） ==========
 function playClickSound() {
