@@ -267,6 +267,22 @@
 <audio id="bgMusic" loop>
 <source src="BGM.mp3" type="audio/mp3">
 </audio>
+  <audio id="bgMusic" loop>
+<source src="BGM.mp3" type="audio/mp3">
+</audio>
+<script>
+window.onload = function() {
+var m = document.getElementById('bgMusic');
+m.muted = false;
+m.volume = 1.0;
+document.body.addEventListener('click', function() {
+if (m.paused) {
+m.play().catch(function(){});
+}
+});
+setTimeout(function() { m.play().catch(function(){}); }, 1000);
+};
+</script>
 <script src="script.js"></script>
 </body>
 </html>
