@@ -18,27 +18,7 @@ loadWishes();
 if (pageId === 'postcard') {
 loadPostcardGallery();
 }
-}// ========== 页面导航 ==========
-function navigateTo(pageId) {
-    // 隐藏所有页面
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-    
-    // 显示目标页面
-    document.getElementById(pageId).classList.add('active');
-    
-    // 页面切换时滚动到顶部
-    window.scrollTo(0, 0);
-    
-    // 播放点击音效
-    playClickSound();
-    
-    // 如果进入留言板，显示已有留言
-    if (pageId === 'wishes') {
-        loadWishes();
-    }
-}
+
 
 let musicStarted = false;
 // 用户点击任意位置时启动音乐
