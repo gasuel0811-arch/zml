@@ -1,38 +1,36 @@
 // ========== 页面导航 ==========
 function navigateTo(pageId) {
-// 隐藏所有页面
-document.querySelectorAll('.page').forEach(page => {
-page.classList.remove('active');
-});
-// 显示目标页面
-document.getElementById(pageId).classList.add('active');
-// 页面切换时滚动到顶部
-window.scrollTo(0, 0);
-// 播放点击音效
-playClickSound();
-// 如果进入留言板，显示已有留言
-if (pageId === 'wishes') {
-loadWishes();
-}
-// 如果进入明信片页，加载已有内容
-if (pageId === 'postcard') {
-loadPostcardGallery();
-}
+    // 隐藏所有页面
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+    
+    // 显示目标页面
+    document.getElementById(pageId).classList.add('active');
+    
+    // 页面切换时滚动到顶部
+    window.scrollTo(0, 0);
+    
+    // 播放点击音效
+    playClickSound();
+    
+    // 如果进入留言板，显示已有留言
+    if (pageId === 'wishes') {
+        loadWishes();
+    }
 }
 
+// ========== 背景音乐 ==========
 let musicStarted = false;
+
 // 用户点击任意位置时启动音乐
 document.addEventListener('click', function initMusic() {
-const bgMusic = document.getElementById('bgMusic');
-if (!musicStarted && bgMusic.src) {
-bgMusic.play().then(() => {
-musicStarted = true;
-console.log('🎵 音乐已启动');
-}).catch(() => {
-console.log('⏳ 音频未准备好，等待下次点击');
-});
-}
-});
+    const bgMusic = document.getElementById('bgMusic');
+    if (!musicStarted && bgMusic.src) {
+        bgMusic.play().catch(() => {});
+        musicStarted = true;
+    }
+}, { once: true });
 
 // ========== 点击音效（用 Web Audio API 生成） ==========
 function playClickSound() {
@@ -73,7 +71,14 @@ window.onload = function() {
         loadWishes();
     }
     
-   
+    // 检查视频是否存在
+    const video = document.getElementById('birthdayVideo');
+    const source = video.querySelector('source');
+    if (source) {
+        source.onerror = function() {
+            video.style.display = 'none';
+        };
+    }
 };
 // ========== 🕯️ 蜡烛生成 ==========
 const candleColors = ['#ff6b6b', '#ff9800', '#ffeb3b', '#4caf50', '#2196f3', '#9c27b0'];
@@ -302,106 +307,4 @@ function startGame(gameId) {
 // 📌 导航到 game 页面时也播放点击音效
 // 修改 navigateTo 函数，添加对 games 页的支持
 // 原来的 navigateTo 函数不用改，因为 games 页面已经存在于 DOM 里了
-// ========== 💌 祝福明信片功能 ==========
-// 存储key
-const POSTCARD_STORAGE_KEY = 'birthdayPostcards';
-
-// 处理上传的图片
-function handlePostcardImages(input) {
-const files = input.files;
-if (files.length === 0) return;
-
-const postcards = JSON.parse(localStorage.getItem(POSTCARD_STORAGE_KEY) || '[]');
-
-const newPostcard = {
-id: Date.now(),
-wish: '',
-images: [],
-time: new Date().toLocaleString('zh-CN')
-};
-
-// 读取每张图片转成 base64
-for (const file of files) {
-const reader = new FileReader();
-reader.onload = function(e) {
-newPostcard.images.push(e.target.result);
-// 如果全部图片都读完了
-if (newPostcard.images.length === files.length) {
-postcards.push(newPostcard);
-localStorage.setItem(POSTCARD_STORAGE_KEY, JSON.stringify(postcards));
-loadPostcardGallery();
-input.value = '';
-}
-};
-reader.readAsDataURL(file);
-}
-}
-
-// 保存祝语
-function savePostcardWish() {
-const wishText = document.getElementById('postcardWishText').value.trim();
-if (!wishText) {
-alert('请写一些祝福内容哦！💌');
-return;
-}
-
-const postcards = JSON.parse(localStorage.getItem(POSTCARD_STORAGE_KEY) || '[]');
-const newPostcard = {
-id: Date.now(),
-wish: wishText,
-images: [],
-time: new Date().toLocaleString('zh-CN')
-};
-
-postcards.push(newPostcard);
-localStorage.setItem(POSTCARD_STORAGE_KEY, JSON.stringify(postcards));
-
-document.getElementById('postcardWishText').value = '';
-loadPostcardGallery();
-showConfetti();
-}
-
-// 加载大家上传的明信片
-function loadPostcardGallery() {
-const postcards = JSON.parse(localStorage.getItem(POSTCARD_STORAGE_KEY) || '[]');
-const wall = document.getElementById('postcardWall');
-const imageGrid = document.getElementById('postcardImageGrid');
-
-// 清空图片网格重新渲染
-imageGrid.innerHTML = '';
-
-// 渲染墙
-wall.innerHTML = '';
-if (postcards.length === 0) {
-wall.innerHTML = '<p style="color: #999; font-style: italic;">还没有祝福明信片，快来上传第一张吧！💌</p>';
-return;
-}
-
-postcards.reverse().forEach((postcard, index) => {
-const item = document.createElement('div');
-item.className = 'postcard-item';
-item.style.animation = `slideIn 0.5s ease ${index * 0.1}s both`;
-
-let photosHtml = '';
-if (postcard.images && postcard.images.length > 0) {
-photosHtml = `
-<div class="postcard-item-photos">
-${postcard.images.map(img => `<img src="${img}" alt="明信片照片">`).join('')}
-</div>
-`;
-}
-
-const wishHtml = postcard.wish 
-? `<div class="postcard-wish-text">${postcard.wish}</div>` 
-: '';
-
-item.innerHTML = `
-<span class="postcard-date">${postcard.time}</span>
-${wishHtml}
-${photosHtml}
-`;
-wall.appendChild(item);
-});
-}
-
 
