@@ -423,13 +423,5 @@ ${photosHtml}
 wall.appendChild(item);
 });
 }
-function playMusic() {
-const bgMusic = document.getElementById('bgMusic');
-if (!bgMusic.paused) return;
-bgMusic.play().then(() => {
-console.log('🎵 音乐已启动');
-}).catch(err => {
-console.log('❌ 启动失败:', err);
-});
-}
+
 
