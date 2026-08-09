@@ -91,14 +91,7 @@ window.onload = function() {
         loadWishes();
     }
     
-    // 检查视频是否存在
-    const video = document.getElementById('birthdayVideo');
-    const source = video.querySelector('source');
-    if (source) {
-        source.onerror = function() {
-            video.style.display = 'none';
-        };
-    }
+   
 };
 // ========== 🕯️ 蜡烛生成 ==========
 const candleColors = ['#ff6b6b', '#ff9800', '#ffeb3b', '#4caf50', '#2196f3', '#9c27b0'];
