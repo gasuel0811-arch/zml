@@ -275,6 +275,12 @@ var bgMusic = document.getElementById('bgMusic');
 <script>
 document.addEventListener('click', function() {
 var bgMusic = document.getElementById('bgMusic');
+<audio id="bgMusic" loop>
+<source src="BGM.mp3" type="audio/mp3">
+</audio>
+<script>
+document.addEventListener('click', function() {
+var bgMusic = document.getElementById('bgMusic');
 if (bgMusic.paused) {
 bgMusic.play().catch(function(){});
 }
