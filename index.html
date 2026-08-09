@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎂 张梦琳 生日快乐！</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- ========== 🏠 首页 ========== -->
+<section id="home" class="page active">
+<div class="container">
+<!-- 气球区域 -->
+<div class="balloons" id="balloonArea"></div>
+<!-- 蛋糕 -->
+<div class="cake-section">
+<div class="cake">
+<!-- 蜡烛容器（由JS生成） -->
+<div class="candles-container" id="candlesContainer"></div>
+<!-- 蛋糕底层 -->
+<div class="cake-bottom">
+<!-- 蜡笔小新头像 -->
+<div class="shinchan">
+<img src="shinchan.png" alt="蜡笔小新">
+</div>
+</div>
+<!-- 蛋糕中层 -->
+<div class="cake-mid"></div>
+<!-- 蛋糕顶层 -->
+<div class="cake-top">
+<div class="cream-border"></div>
+<div class="cake-art-text">18 ZML</div>
+</div>
+<!-- 蛋糕盘 -->
+<div class="cake-plate"></div>
+<!-- 装饰 -->
+<div class="heart-decor">❤️</div>
+<div class="star-decor">⭐</div>
+</div>
+</div>
+<!-- 标题 -->
+<h1 class="title">
+<span class="title-happy">🎉 Happy</span>
+<span class="title-birthday">Birthday</span>
+</h1>
+<h2 class="subtitle">🎂 张梦琳</h2>
+<p class="blessing-text">愿你每一天都如今天一样快乐、灿烂！✨</p>
+<!-- 开始游戏按钮（居中） -->
+<div class="start-game-btn">
+<button class="nav-btn play-btn" onclick="navigateTo('games')">
+<span>🎮 开始游戏</span>
+</button>
+</div>
+</div>
+</section>
+<!-- ========== 🎮 游戏选择页 ========== -->
+<section id="games" class="page">
+<div class="container">
+<h2 class="page-title">🎮 选择游戏</h2>
+<p class="page-subtitle">完成游戏，为张梦琳集齐祝福！</p>
+<div class="games-grid">
+<div class="game-card" onclick="location.href='game.html'">
+<div class="game-icon">🎮</div>
+<h3>张嘎的冒险</h3>
+<p>收集金币，送给塞巴斯蒂安！</p>
+<span class="game-status">可游玩</span>
+</div>
+<div class="game-card" onclick="location.href='minesweeper.html'">
+<div class="game-icon">💣</div>
+<h3>扫雷</h3>
+<p>经典扫雷，挑战手速！</p>
+<span class="game-status">可游玩</span>
+</div>
+<div class="game-card" onclick="location.href='cardgame.html'">
+<div class="game-icon">🃏</div>
+<h3>算24点</h3>
+<p>四张牌凑出24，考验家教王的数学！</p>
+<span class="game-status">可游玩</span>
+</div>
+</div>
+<!-- 尾页入口 -->
+<div class="finale-entry">
+<button class="nav-btn finale-btn" onclick="navigateTo('finale')">
+<span>🎬 进入尾页</span>
+</button>
+</div>
+</div>
+</section>
+<!-- ========== 🎬 尾页选择页 ========== -->
+<section id="finale" class="page">
+<div class="container">
+<h2 class="page-title">🎬 尾页</h2>
+<p class="page-subtitle">完成祝福，为张梦琳送上最后的礼物！</p>
+<!-- 四个入口卡片 -->
+<div class="games-grid finale-grid">
+<!-- 祝福视频 -->
+<div class="game-card" onclick="navigateTo('video')">
+<div class="game-icon">🎥</div>
+<h3>祝福视频</h3>
+<p>观看珍贵的祝福视频</p>
+<span class="game-status">可观看</span>
+</div>
+<!-- 祝福明信片 -->
+<div class="game-card" onclick="navigateTo('postcard')">
+<div class="game-icon">💌</div>
+<h3>祝福明信片</h3>
+<p>上传照片，写下你的祝福</p>
+<span class="game-status">可参与</span>
+</div>
+<!-- 最终尾页 -->
+<div class="game-card" onclick="navigateTo('finale-end')">
+<div class="game-icon">🎆</div>
+<h3>尾页</h3>
+<p>旅途的终点，你的专属</p>
+<span class="game-status">可进入</span>
+</div>
+</div>
+<!-- 开发者日志（左下角小按钮） -->
+<button class="dev-log-btn" onclick="openDevLog()">📝 开发者日志</button>
+</div>
+</section>
+<!-- ========== 💌 祝福明信片页 ========== -->
+<section id="postcard" class="page">
+<div class="container">
+<button class="back-btn" onclick="navigateTo('finale')">← 返回尾页</button>
+<h2 class="page-title">💌 祝福明信片</h2>
+<p class="page-subtitle">上传属于你的回忆，写下对张梦琳的祝福</p>
+<!-- 上传区域 -->
+<div class="postcard-upload">
+<h3 class="section-title">📷 上传你的照片</h3>
+<div class="upload-area" onclick="document.getElementById('postcardImageInput').click()">
+<div class="upload-icon">📷</div>
+<p>点击上传照片（CCD相纸风格）</p>
+<p class="upload-hint">支持 jpg/png 格式</p>
+</div>
+<input type="file" id="postcardImageInput" accept="image/*" multiple style="display:none" onchange="handlePostcardImages(this)">
+<div class="postcard-image-grid" id="postcardImageGrid"></div>
+</div>
+<!-- 祝语区域 -->
+<div class="postcard-wish">
+<h3 class="section-title">💖 写下你的祝语</h3>
+<textarea id="postcardWishText" placeholder="写下想对张梦琳说的话..." maxlength="200"></textarea>
+<button class="send-btn" onclick="savePostcardWish()">💾 保存祝语</button>
+</div>
+<!-- 已有内容展示 -->
+<div class="postcard-gallery">
+<h3 class="section-title">🎞️ 大家的祝福</h3>
+<div class="postcard-wall" id="postcardWall"></div>
+</div>
+</div>
+</section>
+<!-- ========== 🎆 最终尾页 ========== -->
+<section id="finale-end" class="page">
+<div class="container">
+<button class="back-btn" onclick="navigateTo('finale')">← 返回尾页</button>
+<h1 class="title">
+<span class="title-happy">🎉 Thanks for</span>
+<span class="title-birthday">Everything</span>
+</h1>
+<h2 class="subtitle">💖 张梦琳</h2>
+<p class="blessing-text">新的一岁更进一步，愿所有美好都如期而至！✨</p>
+<!-- 装饰 -->
+<div class="finale-end-decor">
+<div class="heart-decor">❤️</div>
+<div class="star-decor">⭐</div>
+</div>
+<!-- 回到首页 -->
+<div class="start-game-btn">
+<button class="nav-btn play-btn" onclick="navigateTo('home')">
+<span>🏠 回到首页</span>
+</button>
+</div>
+</div>
+</section>
+<!-- ========== 📸 回忆相册 ========== -->
+<section id="memories" class="page">
+<div class="container">
+<button class="back-btn" onclick="navigateTo('finale')">← 返回</button>
+<h2 class="page-title">📸 我们的回忆</h2>
+<div class="photo-grid" id="photoGrid">
+<div class="photo-card" onclick="openMemory(0)">
+<div class="photo-placeholder">📷 照片1</div>
+<p class="photo-label">回忆 1</p>
+</div>
+<div class="photo-card" onclick="openMemory(1)">
+<div class="photo-placeholder">📷 照片2</div>
+<p class="photo-label">回忆 2</p>
+</div>
+<div class="photo-card" onclick="openMemory(2)">
+<div class="photo-placeholder">📷 照片3</div>
+<p class="photo-label">回忆 3</p>
+</div>
+<div class="photo-card" onclick="openMemory(3)">
+<div class="photo-placeholder">📷 照片4</div>
+<p class="photo-label">回忆 4</p>
+</div>
+<div class="photo-card" onclick="openMemory(4)">
+<div class="photo-placeholder">📷 照片5</div>
+<p class="photo-label">回忆 5</p>
+</div>
+<div class="photo-card" onclick="openMemory(5)">
+<div class="photo-placeholder">📷 照片6</div>
+<p class="photo-label">回忆 6</p>
+</div>
+</div>
+</div>
+</section>
+<!-- ========== 🎥 祝福视频页 ========== -->
+<section id="video" class="page">
+<div class="container">
+<button class="back-btn" onclick="navigateTo('finale')">← 返回</button>
+<h2 class="page-title">🎥 祝福视频</h2>
+<div class="video-container">
+<video controls playsinline>
+<source src="videos/birthday.mp4" type="video/mp4">
+您的浏览器不支持视频播放。
+</video>
+</div>
+</div>
+</section>
+<!-- ========== ✨ 许愿留言板 ========== -->
+<section id="wishes" class="page">
+<div class="container">
+<button class="back-btn" onclick="navigateTo('finale')">← 返回</button>
+<h2 class="page-title">✨ 许愿留言板</h2>
+<div class="wish-form">
+<input type="text" id="wishName" placeholder="你的名字" maxlength="20">
+<textarea id="wishText" placeholder="写下对自己新一年的希望与祝福..." maxlength="200"></textarea>
+<button class="send-btn" onclick="addWish()">💖 发送祝福</button>
+</div>
+<div class="wishes-wall" id="wishWall"></div>
+</div>
+</section>
+<!-- ========== 照片弹窗 ========== -->
+<div id="memoryModal" class="modal" onclick="closeMemory()">
+<div class="modal-content" onclick="event.stopPropagation()">
+<button class="close-btn" onclick="closeMemory()">✕</button>
+<div class="modal-photo">
+<img src="" alt="回忆照片" id="memoryImage">
+</div>
+<div class="modal-story">
+<h3 id="memoryTitle"></h3>
+<p id="memoryDescription"></p>
+</div>
+</div>
+</div>
+<!-- 开发者日志弹窗 -->
+<div id="devLogModal" class="modal" onclick="closeDevLog()">
+<div class="modal-content dev-log-content" onclick="event.stopPropagation()">
+<button class="close-btn" onclick="closeDevLog()">✕</button>
+<h3 class="section-title">📝 开发者日志</h3>
+<div class="video-container">
+<video id="devLogVideo" controls playsinline>
+<source src="videos/devlog.mp4" type="video/mp4">
+您的浏览器不支持视频播放。
+</video>
+<!-- 开发者日志占位 -->
+<div id="devLogVideoPlaceholder" class="video-placeholder small">
+<div class="placeholder-icon">📝</div>
+<p class="placeholder-text">开发者日志制作中...</p>
+<p class="placeholder-sub">敬请期待！🛠️</p>
+</div>
+</div>
+</div>
+</div>
+<!-- 背景音乐 -->
+<audio id="bgMusic" loop>
+<source src="audio/background.mp3" type="audio/mp3">
+</audio>
+<script src="script.js"></script>
+</body>
+</html>

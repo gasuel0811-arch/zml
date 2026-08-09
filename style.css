@@ -1,0 +1,1049 @@
+/* ========== 全局样式 ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-size: 400% 400%;
+    animation: bgShift 15s ease infinite;
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: #333;
+}
+
+@keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 添加星星闪烁背景 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+        radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 170px 50px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(2px 2px at 220px 90px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 250px 30px, #fff, transparent),
+        radial-gradient(2px 2px at 300px 100px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 350px 60px, #fff, transparent),
+        radial-gradient(2px 2px at 400px 120px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 450px 40px, #fff, transparent);
+    background-size: 500px 150px;
+    animation: twinkle 3s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes twinkle {
+    from { opacity: 0.3; }
+    to { opacity: 0.8; }
+}
+
+/* ========== 页面切换 ========== */
+.page {
+    display: none;
+    min-height: 100vh;
+    padding: 20px;
+    animation: fadeIn 0.5s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+/* ========== 🏠 首页样式 ========== */
+
+.title {
+    margin-top: 20px;
+    font-size: 3.5rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+    line-height: 1.2;
+}
+
+.title-happy {
+    color: #ffd700;
+    display: block;
+    animation: bounce 2s infinite;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.title-birthday {
+    display: block;
+    background: linear-gradient(45deg, #ff6b6b, #ffd700, #ff9800, #ff6b6b);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientMove 3s ease infinite, bounce 2s infinite 0.5s;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.subtitle {
+    margin-top: 10px;
+    font-size: 2rem;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(255, 107, 107, 0.8);
+    animation: sparkle 2s infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 1; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+    50% { opacity: 0.7; text-shadow: 0 0 40px rgba(255, 215, 0, 1); }
+}
+
+.blessing-text {
+    margin-top: 15px;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-style: italic;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ========== 🎂 精致蛋糕 ========== */
+.cake-section {
+    margin: 30px auto 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.cake {
+    width: 280px;
+    height: 260px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* 蜡烛容器 */
+.candles-container {
+    position: absolute;
+    bottom: 170px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 50;
+    pointer-events: none;
+}
+
+/* 蜡烛 */
+.candle {
+    width: 12px;
+    height: 50px;
+    border-radius: 6px;
+    position: relative;
+}
+
+/* 烛芯 */
+.candle::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 12px;
+    background: #795548;
+}
+
+/* 火苗 */
+.candle-flame {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 24px;
+    background: radial-gradient(ellipse at 50% 80%, #fff7d6 0%, #ffeb3b 30%, #ff9800 70%, #ff5722 100%);
+    border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+    box-shadow: 0 0 12px 3px rgba(255, 165, 0, 0.5);
+    animation: flame-wobble 0.3s infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes flame-wobble {
+    0% { transform: translateX(-50%) scale(1) rotate(-3deg); }
+    100% { transform: translateX(-50%) scale(1.1) rotate(3deg); }
+}
+
+/* ===== 蛋糕层 ===== */
+
+/* 顶层 */
+.cake-top {
+    position: absolute;
+    bottom: 125px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 45px;
+    background: linear-gradient(180deg, #fff8f0 0%, #ffe0d0 100%);
+    border-radius: 10px 10px 8px 8px;
+    z-index: 3;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+/* 奶油花边 */
+.cream-border {
+    position: absolute;
+    bottom: -6px;
+    left: -10px;
+    width: calc(100% + 20px);
+    height: 12px;
+    background: radial-gradient(ellipse at center, #fff 0%, #ffe8e8 50%, #ffb3c1 100%);
+    border-radius: 0 0 10px 10px;
+}
+
+/* 艺术字 */
+.cake-art-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Brush Script MT', cursive;
+    font-size: 22px;
+    font-weight: bold;
+    color: #ff6b6b;
+    text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+    white-space: nowrap;
+    letter-spacing: 2px;
+    z-index: 4;
+}
+
+/* 中层 */
+.cake-mid {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 50px;
+    background: linear-gradient(180deg, #ffd0d8 0%, #ffb3c1 100%);
+    border-radius: 10px 10px 8px 8px;
+    z-index: 2;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+/* 底层 */
+.cake-bottom {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 260px;
+    height: 65px;
+    background: linear-gradient(180deg, #ffb3c1 0%, #ff8fa3 100%);
+    border-radius: 10px 10px 8px 8px;
+    z-index: 1;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+}
+
+/* 蜡笔小新 - 圆形徽章 */
+.shinchan {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: transparent;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    mix-blend-mode: multiply;  /* 白底变透明 */
+    filter: contrast(1.1) brightness(1.05);  /* 增强颜色 */
+}
+
+.shinchan img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    mix-blend-mode: multiply;  /* 图片白底变透明 */
+}
+
+/* 蛋糕盘 */
+.cake-plate {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 290px;
+    height: 14px;
+    background: linear-gradient(180deg, #f8f0e8 0%, #e8d8c8 100%);
+    border-radius: 50%;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    z-index: 0;
+}
+
+/* 装饰 */
+.heart-decor {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 20px;
+    z-index: 6;
+    animation: heartbeat 1.5s infinite;
+}
+
+.star-decor {
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    font-size: 16px;
+    z-index: 6;
+    animation: spin-star 3s linear infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+@keyframes spin-star {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+/* ========== 气球 ========== */
+.balloons {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.balloon {
+    position: relative;
+    width: 45px;
+    height: 55px;
+    border-radius: 50% 50% 50% 50% / 55% 55% 45% 45%;
+    opacity: 0.9;
+    box-shadow: inset -5px -8px 10px rgba(0,0,0,0.1);
+    margin: 0 auto;
+}
+
+/* 高光 */
+.balloon::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    width: 10px;
+    height: 15px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 50%;
+    transform: rotate(20deg);
+}
+
+/* 气球上升动画 */
+@keyframes balloon-rise {
+    0% {
+        transform: translateY(0) translateX(0) rotate(-3deg);
+    }
+    25% {
+        transform: translateY(-30vh) translateX(15px) rotate(2deg);
+    }
+    50% {
+        transform: translateY(-60vh) translateX(-15px) rotate(-2deg);
+    }
+    75% {
+        transform: translateY(-90vh) translateX(10px) rotate(3deg);
+    }
+    100% {
+        transform: translateY(-130vh) translateX(0) rotate(-2deg);
+    }
+}
+/* ========== 返回按钮 ========== */
+.back-btn {
+    background: rgba(255, 255, 255, 0.9);
+    color: #ff6b6b;
+    border: 2px solid #ff6b6b;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: #ff6b6b;
+    color: white;
+}
+
+/* ========== 页面标题 ========== */
+.page-title {
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 30px;
+    text-shadow: 0 0 20px rgba(255, 107, 107, 0.8);
+}
+
+/* ========== 📸 照片网格 ========== */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 10px;
+}
+
+@media (max-width: 600px) {
+    .photo-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.photo-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.photo-card:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.photo-placeholder {
+    width: 100%;
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, #ffecd2, #fcb69f);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.photo-card img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.photo-label {
+    font-size: 0.9rem;
+    color: #888;
+    font-weight: bold;
+}
+
+/* ========== 🎥 视频样式 ========== */
+.video-container {
+    margin-top: 20px;
+}
+
+.video-container video {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.video-tip {
+    margin-top: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+/* ========== ✨ 留言板 ========== */
+.wish-form {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+.wish-form input,
+.wish-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 2px solid #ffb3c1;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.wish-form input:focus,
+.wish-form textarea:focus {
+    border-color: #ff6b6b;
+}
+
+.wish-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.send-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ff9800);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.send-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+.wishes-wall {
+    display: grid;
+    gap: 15px;
+}
+
+.wish-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    opacity: 0;
+    animation: slideIn 0.5s ease forwards;
+    border-left: 5px solid #ffd700;
+}
+
+.wish-card .wish-name {
+    font-weight: bold;
+    color: #ff6b6b;
+    margin-bottom: 5px;
+}
+
+.wish-card .wish-text {
+    color: #555;
+    line-height: 1.5;
+}
+
+.wish-card .wish-time {
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-top: 8px;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* ========== 照片弹窗 ========== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    text-align: center;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    z-index: 10;
+}
+
+.modal-photo img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.modal-story {
+    margin-top: 15px;
+    text-align: left;
+}
+
+.modal-story h3 {
+    color: #ff6b6b;
+    margin-bottom: 10px;
+}
+
+.modal-story p {
+    color: #555;
+    line-height: 1.6;
+}
+
+audio {
+    display: none;
+}
+/* ========== 🎮 游戏选择页 ========== */
+.page-subtitle {
+    color: #888;
+    margin-bottom: 20px;
+}
+
+/* 开始游戏按钮 */
+.game-start-btn {
+    margin-top: 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.play-btn {
+    background: linear-gradient(135deg, #4caf50, #8bc34a) !important;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4) !important;
+    font-size: 1.3rem !important;
+    padding: 18px 35px !important;
+    animation: pulse-game 2s infinite;
+}
+
+@keyframes pulse-game {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4) !important;
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.6) !important;
+    }
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 10px;
+}
+
+.game-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.game-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.game-card h3 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.game-card p {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.game-status {
+    display: inline-block;
+    background: #f0f0f0;
+    color: #999;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+/* ========== 🎬 尾页 ========== */
+.finale-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 250px;
+    margin: 0 auto;
+    margin-top: 30px;
+}
+
+.finale-buttons .nav-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+/* 开始游戏按钮（居中） */
+.start-game-btn {
+    margin-top: 30px;
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+}
+
+.play-btn {
+    background: linear-gradient(135deg, #4caf50, #8bc34a) !important;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4) !important;
+    font-size: 1.3rem !important;
+    padding: 18px 35px !important;
+    animation: pulse-game 2s infinite;
+}
+
+@keyframes pulse-game {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.6);
+    }
+}
+/* ========== 📱 移动端适配 ========== */
+@media (max-width: 480px) {
+    .title {
+        font-size: 2.5rem;
+    }
+    
+    .subtitle {
+        font-size: 1.5rem;
+    }
+    
+    .cake {
+        width: 240px;
+        height: 240px;
+        transform: scale(0.9);
+    }
+    
+    .nav-btn {
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
+    
+    .start-game-btn .play-btn {
+        font-size: 1.1rem !important;
+        padding: 15px 30px !important;
+    }
+    
+    .games-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+    
+    .photo-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ========== 🎮 游戏卡片悬停效果 ========== */
+.game-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.game-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 70%
+    );
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+/* ========== 🎬 尾页改造 ========== */
+.dev-log-btn {
+position: fixed;
+bottom: 20px;
+left: 20px;
+background: rgba(255, 255, 255, 0.85);
+color: #666;
+border: 2px solid #ddd;
+padding: 8px 18px;
+border-radius: 20px;
+font-size: 0.9rem;
+cursor: pointer;
+transition: all 0.3s ease;
+z-index: 200;
+box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.dev-log-btn:hover {
+background: #666;
+color: white;
+border-color: #666;
+}
+.finale-grid {
+grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+/* ========== 💌 明信片页 ========== */
+.postcard-upload,
+.postcard-wish,
+.postcard-gallery {
+background: rgba(255, 255, 255, 0.92);
+border-radius: 20px;
+padding: 20px;
+margin-bottom: 25px;
+box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+}
+
+/* 上传区域 */
+.upload-area {
+border: 3px dashed #b8a594;
+border-radius: 15px;
+padding: 40px 20px;
+text-align: center;
+cursor: pointer;
+transition: all 0.3s ease;
+background: linear-gradient(135deg, #fdf8f0, #f8ead8);
+}
+.upload-area:hover {
+border-color: #8d6e63;
+background: linear-gradient(135deg, #fdf8f0, #f0dcc0);
+}
+.upload-icon {
+font-size: 3rem;
+margin-bottom: 10px;
+}
+.upload-hint {
+color: #999;
+font-size: 0.85rem;
+margin-top: 5px;
+}
+
+/* 明信片图片网格 */
+.postcard-image-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+gap: 12px;
+margin-top: 15px;
+}
+
+/* CCD相纸风格 */
+.postcard-photo {
+background: #f5f0e8;
+padding: 8px 8px 20px 8px;
+border-radius: 3px;
+box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+position: relative;
+transition: transform 0.3s ease;
+}
+.postcard-photo:hover {
+transform: scale(1.05) rotate(-1deg);
+}
+.postcard-photo img {
+width: 100%;
+aspect-ratio: 1;
+object-fit: cover;
+filter: sepia(0.15) contrast(1.05) brightness(1.02);
+border-radius: 2px;
+}
+/* 相纸底部白边效果 */
+.postcard-photo::after {
+content: '';
+position: absolute;
+bottom: 5px;
+left: 50%;
+transform: translateX(-50%);
+width: 60%;
+height: 10px;
+background: repeating-linear-gradient(
+90deg,
+transparent 0px,
+transparent 4px,
+#e0d8c8 4px,
+#e0d8c8 5px
+);
+opacity: 0.5;
+}
+
+/* 祝语区域 */
+.postcard-wish textarea {
+width: 100%;
+padding: 15px;
+border: 2px solid #b8a594;
+border-radius: 12px;
+font-size: 1rem;
+resize: vertical;
+min-height: 100px;
+outline: none;
+font-family: 'KaiTi', 'STKaiti', cursive;
+background: #fdf8f0;
+transition: border-color 0.3s;
+}
+.postcard-wish textarea:focus {
+border-color: #ff6b6b;
+}
+
+/* 大家的祝福墙 */
+.postcard-wall {
+display: grid;
+gap: 20px;
+}
+
+/* 明信片样式卡片 */
+.postcard-item {
+background: linear-gradient(145deg, #fdf8f0, #f5ead8);
+border: 1px solid #d4c4a8;
+border-radius: 10px;
+padding: 20px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+position: relative;
+}
+.postcard-item::before {
+content: '✉️';
+position: absolute;
+top: -10px;
+left: 15px;
+font-size: 1.5rem;
+}
+.postcard-item .postcard-date {
+position: absolute;
+top: 10px;
+right: 15px;
+font-size: 0.75rem;
+color: #999;
+}
+.postcard-item .postcard-wish-text {
+font-family: 'KaiTi', 'STKaiti', cursive;
+font-size: 1.1rem;
+color: #5d4037;
+line-height: 1.7;
+padding: 10px 0;
+border-bottom: 1px dashed #d4c4a8;
+margin-bottom: 15px;
+}
+.postcard-item .postcard-item-photos {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+}
+.postcard-item .postcard-item-photos img {
+width: 80px;
+height: 80px;
+object-fit: cover;
+border-radius: 3px;
+filter: sepia(0.1) contrast(1.05);
+box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+border: 3px solid #fff;
+}
+
+/* ========== 🎆 最终尾页 ========== */
+#finale-end .container {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+min-height: 80vh;
+}
+.finale-end-decor {
+position: relative;
+width: 100%;
+height: 100px;
+margin-top: 20px;
+}
+.finale-end-decor .heart-decor {
+position: absolute;
+top: 20px;
+left: 30%;
+animation: heartbeat 1.5s infinite;
+}
+.finale-end-decor .star-decor {
+position: absolute;
+top: 10px;
+right: 30%;
+animation: spin-star 3s linear infinite;
+}
+.finale-end-decor::before,
+.finale-end-decor::after {
+content: '✨';
+position: absolute;
+font-size: 1.5rem;
+}
+.finale-end-decor::before {
+top: 50px;
+left: 15%;
+animation: sparkle 2s infinite;
+}
+.finale-end-decor::after {
+top: 40px;
+right: 18%;
+animation: sparkle 2s infinite 1s;
+}

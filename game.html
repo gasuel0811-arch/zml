@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>张嘎的冒险</title>
+  <link rel="stylesheet" href="game.css" />
+</head>
+<body>
+  <!-- 返回游戏选择按钮 -->
+  <button class="back-btn" onclick="location.href='index.html'">← 返回游戏选择</button>
+  
+  <div id="game-container">
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+    <!-- Mobile Touch Controls -->
+    <div id="mobile-controls">
+      <div id="left-controls">
+        <button class="ctrl-btn" id="btn-left">&#9664;</button>
+        <button class="ctrl-btn" id="btn-right">&#9654;</button>
+      </div>
+      <div id="right-controls">
+        <button class="ctrl-btn" id="btn-jump">&#9650;</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

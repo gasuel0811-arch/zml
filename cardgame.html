@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🃏 24点合并</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+.back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 165, 0, 0.3);
+    color: #ffa500;
+    border: 2px solid rgba(255, 165, 0, 0.5);
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+.back-btn:hover {
+    background: rgba(255, 165, 0, 0.5);
+    color: #fff;
+    transform: scale(1.05);
+}
+.game-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+    backdrop-filter: blur(10px);
+}
+.game-title {
+    font-size: 32px;
+    color: #ffa500;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.game-subtitle {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+/* 牌面区域 */
+.cards-area {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    min-height: 130px;
+    align-items: center;
+}
+.card {
+    width: 80px;
+    height: 110px;
+    background: linear-gradient(145deg, #fff 0%, #f0f0f0 100%);
+    border-radius: 10px;
+    border: 3px solid #ddd;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+    user-select: none;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.card.selected {
+    border-color: #ffa500;
+    box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+    transform: translateY(-10px);
+}
+.card.red .card-number,
+.card.red .card-suit { color: #e74c3c; }
+.card.black .card-number,
+.card.black .card-suit { color: #2c3e50; }
+.card-number {
+    font-size: 36px;
+    color: #333;
+    line-height: 1;
+    word-break: break-all;
+    max-width: 70px;
+}
+.card-suit {
+    font-size: 18px;
+    margin-top: 5px;
+}
+.card.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    transform: scale(0.85);
+}
+/* 操作提示 */
+.hint-text {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 15px;
+    min-height: 20px;
+}
+/* 剩余次数 */
+.attempts-left {
+    color: #ffa500;
+    font-size: 14px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+/* 运算符按钮 */
+.op-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+.op-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.op-btn:hover:not(:disabled) {
+    background: rgba(255, 165, 0, 0.3);
+    border-color: #ffa500;
+    transform: scale(1.05);
+}
+.op-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+}
+/* 操作按钮 */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+.action-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.action-btn:hover:not(:disabled) {
+    background: rgba(255, 165, 0, 0.3);
+    border-color: #ffa500;
+}
+.action-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+/* 无解按钮特殊样式 */
+.no-solution-btn {
+    border-color: rgba(231, 76, 60, 0.5);
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+}
+.no-solution-btn:hover:not(:disabled) {
+    background: rgba(231, 76, 60, 0.3);
+    border-color: #e74c3c;
+}
+/* 结果显示 */
+.result-message {
+    font-size: 20px;
+    margin: 20px 0 10px;
+    min-height: 30px;
+    font-weight: bold;
+}
+.result-message.success { color: #2ecc71; }
+.result-message.error { color: #e74c3c; }
+.result-message.info { color: #3498db; }
+/* 得分区域 */
+.score-area {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.score-item {
+    text-align: center;
+}
+.score-label {
+    font-size: 12px;
+    color: #aaa;
+}
+.score-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ffa500;
+}
+/* 胜利弹窗 */
+.victory-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.victory-overlay.show {
+    display: flex;
+}
+.victory-box {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: popIn 0.4s;
+    color: #333;
+}
+@keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.victory-emoji {
+    font-size: 64px;
+    margin-bottom: 10px;
+}
+.victory-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ffa500;
+    margin-bottom: 10px;
+}
+.victory-detail {
+    color: #999;
+    margin-bottom: 20px;
+}
+.victory-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.victory-btn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+.victory-btn.again {
+    background: #ffa500;
+    color: white;
+}
+.victory-btn.again:hover {
+    background: #ff8c00;
+    transform: scale(1.05);
+}
+.victory-btn.back {
+    background: #f0f0f0;
+    color: #333;
+}
+.victory-btn.back:hover {
+    background: #ddd;
+}
+/* 失败弹窗 */
+.fail-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.fail-overlay.show {
+    display: flex;
+}
+.fail-box {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: popIn 0.4s;
+    color: #333;
+}
+.fail-emoji {
+    font-size: 64px;
+    margin-bottom: 10px;
+}
+.fail-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #e74c3c;
+    margin-bottom: 10px;
+}
+.fail-detail {
+    color: #999;
+    margin-bottom: 20px;
+}
+.fail-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.fail-btn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+.fail-btn.retry {
+    background: #ffa500;
+    color: white;
+}
+.fail-btn.retry:hover {
+    background: #ff8c00;
+    transform: scale(1.05);
+}
+.fail-btn.new {
+    background: #f0f0f0;
+    color: #333;
+}
+.fail-btn.new:hover {
+    background: #ddd;
+}
+/* 分数变化提示 */
+.score-popup {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 2000;
+    pointer-events: none;
+    animation: scoreFloat 1s ease-out forwards;
+}
+.score-popup.positive { color: #2ecc71; }
+.score-popup.negative { color: #e74c3c; }
+@keyframes scoreFloat {
+    0% { opacity: 1; transform: translate(-50%, -50%); }
+    100% { opacity: 0; transform: translate(-50%, -150%); }
+}
+</style>
+</head>
+<body>
+<button class="back-btn" onclick="location.href='index.html'">← 返回游戏选择</button>
+<div class="game-container">
+    <div class="game-title">🃏 24点合并</div>
+    <div class="game-subtitle">选两张牌 + 运算符，合并出24吧！</div>
+    <!-- 牌面区域 -->
+    <div class="cards-area" id="cardsArea"></div>
+    <!-- 操作提示 -->
+    <div class="hint-text" id="hintText">👆 点击选择两张牌</div>
+    <!-- 剩余次数 -->
+    <div class="attempts-left" id="attemptsLeft">剩余计算次数：5</div>
+    <!-- 运算符按钮 -->
+    <div class="op-buttons">
+        <button class="op-btn" onclick="applyOperator('+')">+</button>
+        <button class="op-btn" onclick="applyOperator('-')">−</button>
+        <button class="op-btn" onclick="applyOperator('×')">×</button>
+        <button class="op-btn" onclick="applyOperator('÷')">÷</button>
+    </div>
+    <!-- 操作按钮 -->
+    <div class="action-buttons">
+        <button class="action-btn no-solution-btn" onclick="claimNoSolution()">🤷 算不出来</button>
+        <button class="action-btn" onclick="resetGame()">🔄 重来</button>
+        <button class="action-btn" onclick="newPuzzle()">🎲 新题</button>
+    </div>
+    <!-- 结果显示 -->
+    <div class="result-message" id="resultMessage"></div>
+    <!-- 得分区域 -->
+    <div class="score-area">
+        <div class="score-item">
+            <div class="score-label">💰 积分</div>
+            <div class="score-value" id="totalScore">0</div>
+        </div>
+        <div class="score-item">
+            <div class="score-label">通关次数</div>
+            <div class="score-value" id="winCount">0</div>
+        </div>
+        <div class="score-item">
+            <div class="score-label">计算次数</div>
+            <div class="score-value" id="calcCount">0</div>
+        </div>
+    </div>
+</div>
+<!-- 胜利弹窗 -->
+<div class="victory-overlay" id="victoryOverlay">
+    <div class="victory-box">
+        <div class="victory-emoji">🎉</div>
+        <div class="victory-title">恭喜通关！</div>
+        <div class="victory-detail" id="victoryDetail">共用了 0 次计算！+100分</div>
+        <div class="victory-buttons">
+            <button class="victory-btn again" onclick="newPuzzle()">🎲 再来一题</button>
+            <button class="victory-btn back" onclick="resetGame()">🔄 重试本题</button>
+        </div>
+    </div>
+</div>
+<!-- 失败弹窗 -->
+<div class="fail-overlay" id="failOverlay">
+    <div class="fail-box">
+        <div class="fail-emoji">😢</div>
+        <div class="fail-title">挑战失败！</div>
+        <div class="fail-detail" id="failDetail">计算次数用完了</div>
+        <div class="fail-buttons">
+            <button class="fail-btn retry" onclick="resetGame()">🔄 重试本题</button>
+            <button class="fail-btn new" onclick="newPuzzle()">🎲 换一题</button>
+        </div>
+    </div>
+</div>
+<script>
+// ========== 游戏状态 ==========
+let cards = [];           // 当前所有卡牌（分数数组，用 {n: 分子, d: 分母} 表示）
+let originalCards = [];   // 保存原始题目（用于重试）
+let selectedIndexes = []; // 选中的卡牌索引
+let calcCount = 0;        // 当前题计算次数
+let winCount = 0;         // 通关次数
+let totalScore = 0;       // 总积分
+let isVictory = false;    // 是否胜利
+let isFailed = false;     // 是否失败
+let gameOver = false;     // 游戏是否结束（无论胜/负）
+let maxAttempts = 5;      // 最大计算次数限制
+
+// 积分规则
+const SCORE_PER_CALC = 10;      // 每次成功计算
+const SCORE_WIN = 100;          // 成功算出24
+const SCORE_NO_SOLUTION = 150;  // 正确判定无解（比算出24分更多）
+const SCORE_WRONG_NO_SOLUTION = -50; // 误判无解（其实有解）
+
+// ========== 分数工具函数 ==========
+// 计算最大公约数
+function gcd(a, b) {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b !== 0) {
+        [a, b] = [b, a % b];
+    }
+    return a;
+}
+
+// 创建分数（自动约分）
+function makeFraction(n, d = 1) {
+    if (d === 0) return null; // 分母不能为0
+    const g = gcd(n, d);
+    n = n / g;
+    d = d / g;
+    // 规范：分母永远为正，符号放在分子上
+    if (d < 0) {
+        n = -n;
+        d = -d;
+    }
+    return { n, d };
+}
+
+// 分数加减乘除
+function fracAdd(a, b) { return makeFraction(a.n * b.d + b.n * a.d, a.d * b.d); }
+function fracSub(a, b) { return makeFraction(a.n * b.d - b.n * a.d, a.d * b.d); }
+function fracMul(a, b) { return makeFraction(a.n * b.n, a.d * b.d); }
+function fracDiv(a, b) { return makeFraction(a.n * b.d, a.d * b.n); }
+
+// 分数转显示字符串
+function fracToString(f) {
+    if (!f) return 'null';
+    if (f.d === 1) return f.n.toString();
+    if (f.n === 0) return '0';
+    return `${f.n}/${f.d}`;
+}
+
+// 分数是否等于24
+function is24(frac) {
+    return frac.n === 24 && frac.d === 1;
+}
+
+// ========== 生成随机牌 ==========
+function generateCards() {
+    const nums = [];
+    for (let i = 0; i < 4; i++) {
+        nums.push(Math.floor(Math.random() * 13) + 1);
+    }
+    // 检查是否有解，没有就重新生成
+    let solution = solve(nums);
+    let attempts = 0;
+    while (!solution && attempts < 100) {
+        for (let i = 0; i < 4; i++) {
+            nums[i] = Math.floor(Math.random() * 13) + 1;
+        }
+        solution = solve(nums);
+        attempts++;
+    }
+    // 转为分数格式
+    return nums.map(n => makeFraction(n));
+}
+
+// ========== 求解24点（用分数）==========
+function solve(nums) {
+    const ops = [fracAdd, fracSub, fracMul, fracDiv];
+    
+    function trySolve(fractions) {
+        if (fractions.length === 1) {
+            return is24(fractions[0]);
+        }
+        for (let i = 0; i < fractions.length; i++) {
+            for (let j = 0; j < fractions.length; j++) {
+                if (i === j) continue;
+                for (const op of ops) {
+                    const val = op(fractions[i], fractions[j]);
+                    if (val === null) continue; // 除零等情况
+                    const newFracs = [];
+                    for (let k = 0; k < fractions.length; k++) {
+                        if (k !== i && k !== j) newFracs.push(fractions[k]);
+                    }
+                    newFracs.push(val);
+                    if (trySolve(newFracs)) return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    return trySolve(nums.map(n => makeFraction(n)));
+}
+
+// ========== 积分相关 ==========
+// 加分并显示浮动效果
+function addScore(points, showPopup = true) {
+    totalScore += points;
+    document.getElementById('totalScore').textContent = totalScore;
+    
+    if (showPopup && points !== 0) {
+        const popup = document.createElement('div');
+        const sign = points > 0 ? '+' : '';
+        popup.className = `score-popup ${points > 0 ? 'positive' : 'negative'}`;
+        popup.textContent = `${sign}${points} 分`;
+        document.body.appendChild(popup);
+        setTimeout(() => popup.remove(), 1000);
+    }
+}
+
+// ========== 初始化新题 ==========
+function newPuzzle() {
+    originalCards = generateCards();
+    // 换新题，重置剩余次数
+    calcCount = 0;
+    document.getElementById('calcCount').textContent = '0';
+    resetGame();
+}
+
+// ========== 重置当前题 ==========
+function resetGame() {
+    cards = [...originalCards];  // 恢复原始题目
+    selectedIndexes = [];
+    // calcCount 不重置，剩余次数保持
+    isVictory = false;
+    isFailed = false;
+    gameOver = false;
+    document.getElementById('resultMessage').textContent = '';
+    document.getElementById('resultMessage').className = 'result-message';
+    document.getElementById('victoryOverlay').classList.remove('show');
+    document.getElementById('failOverlay').classList.remove('show');
+    document.getElementById('hintText').textContent = '👆 点击选择两张牌';
+    updateAttemptsDisplay();
+    renderCards();
+    enableAllButtons();
+}
+// ========== 更新剩余次数显示 ==========
+function updateAttemptsDisplay() {
+    const remaining = maxAttempts - calcCount;
+    document.getElementById('attemptsLeft').textContent = `剩余计算次数：${remaining}`;
+    if (remaining <= 0) {
+        // 计算次数用完，自动换新题
+        gameOver = true;
+        document.getElementById('hintText').textContent = '😅 计算次数用完了，自动换新题...';
+        disableAllButtons();
+        setTimeout(() => {
+            newPuzzle();
+        }, 1500);
+    }
+}
+
+// ========== 禁用/启用所有操作按钮 ==========
+function enableAllButtons() {
+    document.querySelectorAll('.op-btn').forEach(btn => btn.disabled = false);
+    document.querySelectorAll('.action-btn').forEach(btn => btn.disabled = false);
+}
+
+function disableAllButtons() {
+    document.querySelectorAll('.op-btn').forEach(btn => btn.disabled = true);
+    document.querySelectorAll('.action-btn').forEach(btn => btn.disabled = true);
+}
+
+// ========== 渲染卡牌 ==========
+function renderCards() {
+    const area = document.getElementById('cardsArea');
+    area.innerHTML = '';
+    const suits = ['♥', '♦', '♠', '♣'];
+    cards.forEach((frac, index) => {
+        const isRed = index % 2 === 0;
+        const isSelected = selectedIndexes.includes(index);
+        const card = document.createElement('div');
+        card.className = `card ${isRed ? 'red' : 'black'} ${isSelected ? 'selected' : ''}`;
+        if (gameOver) {
+            card.classList.add('disabled');
+        }
+        if (!gameOver) {
+            card.onclick = () => toggleSelect(index);
+        }
+        const displayNum = fracToString(frac);
+        // 如果分数较长，缩小字体
+        const fontSize = displayNum.length > 5 ? '20px' : (displayNum.length > 3 ? '28px' : '36px');
+        card.innerHTML = `
+            <span class="card-number" style="font-size:${fontSize}">${displayNum}</span>
+            <span class="card-suit">${suits[index % 4]}</span>
+        `;
+        area.appendChild(card);
+    });
+}
+
+// ========== 点击选择卡牌 ==========
+function toggleSelect(index) {
+    if (gameOver) return;
+    if (selectedIndexes.includes(index)) {
+        // 取消选中
+        selectedIndexes = selectedIndexes.filter(i => i !== index);
+    } else {
+        // 最多选两张
+        if (selectedIndexes.length >= 2) {
+            selectedIndexes = [selectedIndexes[1], index];
+        } else {
+            selectedIndexes.push(index);
+        }
+    }
+    // 更新提示
+    updateHint();
+    renderCards();
+}
+
+// ========== 更新提示文字 ==========
+function updateHint() {
+    const hint = document.getElementById('hintText');
+    if (selectedIndexes.length === 0) {
+        hint.textContent = '👆 点击选择两张牌';
+    } else if (selectedIndexes.length === 1) {
+        hint.textContent = `已选 ${fracToString(cards[selectedIndexes[0]])}，再选一张`;
+    } else {
+        hint.textContent = `已选 ${fracToString(cards[selectedIndexes[0]])} 和 ${fracToString(cards[selectedIndexes[1]])}，选择运算符`;
+    }
+}
+
+// ========== 应用运算符 ==========
+function applyOperator(op) {
+    if (gameOver) return;
+    if (selectedIndexes.length !== 2) {
+        showMessage('⚠️ 请先选择两张牌！', 'error');
+        return;
+    }
+    
+    // 检查剩余次数
+    if (calcCount >= maxAttempts) {
+        showMessage('❌ 计算次数已用完！', 'error');
+        updateAttemptsDisplay();
+        return;
+    }
+    
+    const [i1, i2] = selectedIndexes;
+    const a = cards[i1];
+    const b = cards[i2];
+    let result;
+    
+    switch (op) {
+        case '+': result = fracAdd(a, b); break;
+        case '-': result = fracSub(a, b); break;
+        case '×': result = fracMul(a, b); break;
+        case '÷':
+            result = fracDiv(a, b);
+            if (result === null) {
+                showMessage('❌ 不能除以0！', 'error');
+                return;
+            }
+            break;
+    }
+    
+    
+    
+    updateAttemptsDisplay();
+    
+    // 移除两张牌，替换为新牌
+    const newCards = [];
+    for (let i = 0; i < cards.length; i++) {
+        if (i === i1 || i === i2) continue;
+        newCards.push(cards[i]);
+    }
+    newCards.push(result);
+    cards = newCards;
+    selectedIndexes = [];
+    renderCards();
+    
+     // 检查结果
+    if (cards.length === 1) {
+        if (is24(cards[0])) {
+            // 胜利！
+            winCount++;
+            document.getElementById('winCount').textContent = winCount;
+            addScore(SCORE_WIN);
+            showVictory();
+        } else {
+            // 结果不是24，扣减剩余次数
+            showMessage(`❌ 结果是 ${fracToString(cards[0])}，不是 24！`, 'error');
+            document.getElementById('hintText').textContent = '😅 结果不是24，点击"重来"试试其他方法';
+            // 扣减剩余次数
+            calcCount++;
+            document.getElementById('calcCount').textContent = calcCount;
+            updateAttemptsDisplay();
+            // 扣分
+            addScore(-20);
+        }
+    }else {
+        // 还有多张牌，继续
+            showMessage(`✅ ${fracToString(a)} ${op} ${fracToString(b)} = ${fracToString(result)}`, 'info');
+        updateHint();
+        
+        // 检查是否还有剩余次数
+        if (calcCount >= maxAttempts) {
+            gameOver = true;
+            document.getElementById('hintText').textContent = '⏰ 计算次数用完，游戏结束！';
+            showFailOverlay('计算次数用完了，挑战失败！');
+            disableAllButtons();
+        }
+    }
+}
+
+// ========== 无解判定 ==========
+function claimNoSolution() {
+    if (gameOver) return;
+    
+    // 用当前cards的数值来检查当前局面是否有解
+    const currentNums = cards.map(f => f.n / f.d); // 转成数字
+    const hasSolution = solve(currentNums);
+    
+    if (!hasSolution) {
+        // 确认无解，加分（比算出24分更多）
+        showMessage('✅ 确实无解！+150分', 'success');
+        document.getElementById('hintText').textContent = '🎉 恭喜判定正确！点击"新题"继续';
+        addScore(SCORE_NO_SOLUTION);
+        // 本题结束，显示弹窗
+        gameOver = true;
+        disableAllButtons();
+        setTimeout(() => {
+            document.getElementById('failOverlay').classList.add('show');
+            document.getElementById('failDetail').textContent = '✅ 确实无解！+150分，本题结束！';
+        }, 500);
+    }    else {
+        // 其实有解，扣分并扣减剩余次数
+        showMessage('❌ 其实有解！-50分，扣1次机会', 'error');
+        document.getElementById('hintText').textContent = '😅 再仔细想想，这张题是有解的！';
+        addScore(SCORE_WRONG_NO_SOLUTION);
+        // 扣减剩余次数
+        calcCount++;
+        document.getElementById('calcCount').textContent = calcCount;
+        updateAttemptsDisplay();
+        // 如果还有次数，游戏继续
+        if (calcCount < maxAttempts) {
+            gameOver = false;
+            enableAllButtons();
+            renderCards();
+        }
+    }
+}
+// ========== 显示消息 ==========
+function showMessage(text, type) {
+    const msg = document.getElementById('resultMessage');
+    msg.textContent = text;
+    msg.className = `result-message ${type}`;
+}
+
+// ========== 胜利弹窗 ==========
+function showVictory() {
+    isVictory = true;
+    gameOver = true;
+    showMessage('🎉 恭喜！你算出了24！(+100分)', 'success');
+    document.getElementById('victoryDetail').textContent = `共用了 ${calcCount} 次计算！+100分`;
+    disableAllButtons();
+    setTimeout(() => {
+        document.getElementById('victoryOverlay').classList.add('show');
+    }, 500);
+}
+
+// ========== 失败弹窗 ==========
+function showFailOverlay(detail) {
+    document.getElementById('failDetail').textContent = detail;
+    setTimeout(() => {
+        document.getElementById('failOverlay').classList.add('show');
+    }, 500);
+}
+
+// ========== 初始化 ==========
+newPuzzle();
+</script>
+</body>
+</html>
