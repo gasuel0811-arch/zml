@@ -53,6 +53,7 @@
 </div>
 </div>
 </section>
+
 <!-- ========== 🎮 游戏选择页 ========== -->
 <section id="games" class="page">
 <div class="container">
@@ -86,92 +87,74 @@
 </div>
 </div>
 </section>
-<!-- ========== 🎬 尾页选择页 ========== -->
+
+<!-- ========== 🎬 尾页（祝福视频/开发者日志/展望） ========== -->
 <section id="finale" class="page">
 <div class="container">
+<button class="back-btn" onclick="navigateTo('games')">← 返回游戏</button>
 <h2 class="page-title">🎬 尾页</h2>
-<p class="page-subtitle">完成祝福，为张梦琳送上最后的礼物！</p>
-<!-- 四个入口卡片 -->
-<div class="games-grid finale-grid">
-<!-- 祝福视频 -->
-<div class="game-card" onclick="navigateTo('video')">
-<div class="game-icon">🎥</div>
-<h3>祝福视频</h3>
-<p>观看珍贵的祝福视频</p>
-<span class="game-status">可观看</span>
-</div>
-<!-- 祝福明信片 -->
-<div class="game-card" onclick="navigateTo('postcard')">
-<div class="game-icon">💌</div>
-<h3>祝福明信片</h3>
-<p>上传照片，写下你的祝福</p>
-<span class="game-status">可参与</span>
-</div>
-<!-- 最终尾页 -->
-<div class="game-card" onclick="navigateTo('finale-end')">
-<div class="game-icon">🎆</div>
-<h3>尾页</h3>
-<p>旅途的终点，你的专属</p>
-<span class="game-status">可进入</span>
+
+<!-- ===== 祝福视频 ===== -->
+<div class="finale-section">
+<h3 class="section-title">🎥 祝福视频</h3>
+<div class="video-container">
+<!-- 视频（暂时没有，用占位） -->
+<video id="birthdayVideo" controls playsinline>
+<source src="videos/birthday.mp4" type="video/mp4">
+您的浏览器不支持视频播放。
+</video>
+<!-- 视频占位 -->
+<div id="birthdayVideoPlaceholder" class="video-placeholder">
+<div class="placeholder-icon">🎥</div>
+<p class="placeholder-text">祝福视频制作中...</p>
+<p class="placeholder-sub">敬请期待！✨</p>
 </div>
 </div>
-<!-- 开发者日志（左下角小按钮） -->
+</div>
+
+<!-- ===== 开发者日志（角落小按钮） ===== -->
 <button class="dev-log-btn" onclick="openDevLog()">📝 开发者日志</button>
+
+<!-- ===== 展望（可编辑） ===== -->
+<div class="finale-section">
+<h3 class="section-title">🔮 展望</h3>
+<div class="outlook-container">
+<!-- 文字编辑区 -->
+<div class="outlook-text">
+<textarea id="outlookText" placeholder="写下你对未来的展望..." maxlength="500"></textarea>
+<button class="save-btn" onclick="saveOutlookText()">💾 保存文字</button>
 </div>
-</section>
-<!-- ========== 💌 祝福明信片页 ========== -->
-<section id="postcard" class="page">
-<div class="container">
-<button class="back-btn" onclick="navigateTo('finale')">← 返回尾页</button>
-<h2 class="page-title">💌 祝福明信片</h2>
-<p class="page-subtitle">上传属于你的回忆，写下对张梦琳的祝福</p>
-<!-- 上传区域 -->
-<div class="postcard-upload">
-<h3 class="section-title">📷 上传你的照片</h3>
-<div class="upload-area" onclick="document.getElementById('postcardImageInput').click()">
-<div class="upload-icon">📷</div>
-<p>点击上传照片（CCD相纸风格）</p>
-<p class="upload-hint">支持 jpg/png 格式</p>
-</div>
-<input type="file" id="postcardImageInput" accept="image/*" multiple style="display:none" onchange="handlePostcardImages(this)">
-<div class="postcard-image-grid" id="postcardImageGrid"></div>
-</div>
-<!-- 祝语区域 -->
-<div class="postcard-wish">
-<h3 class="section-title">💖 写下你的祝语</h3>
-<textarea id="postcardWishText" placeholder="写下想对张梦琳说的话..." maxlength="200"></textarea>
-<button class="send-btn" onclick="savePostcardWish()">💾 保存祝语</button>
-</div>
-<!-- 已有内容展示 -->
-<div class="postcard-gallery">
-<h3 class="section-title">🎞️ 大家的祝福</h3>
-<div class="postcard-wall" id="postcardWall"></div>
+<!-- 图片添加区 -->
+<div class="outlook-images">
+<div class="outlook-image-grid" id="outlookImageGrid"></div>
+<div class="add-image-btn" onclick="addOutlookImage()">➕ 添加图片</div>
+<input type="file" id="outlookImageInput" accept="image/*" multiple style="display:none" onchange="handleOutlookImages(this)">
 </div>
 </div>
-</section>
-<!-- ========== 🎆 最终尾页 ========== -->
-<section id="finale-end" class="page">
-<div class="container">
-<button class="back-btn" onclick="navigateTo('finale')">← 返回尾页</button>
-<h1 class="title">
-<span class="title-happy">🎉 Thanks for</span>
-<span class="title-birthday">Everything</span>
-</h1>
-<h2 class="subtitle">💖 张梦琳</h2>
-<p class="blessing-text">新的一岁更进一步，愿所有美好都如期而至！✨</p>
-<!-- 装饰 -->
-<div class="finale-end-decor">
-<div class="heart-decor">❤️</div>
-<div class="star-decor">⭐</div>
 </div>
-<!-- 回到首页 -->
-<div class="start-game-btn">
-<button class="nav-btn play-btn" onclick="navigateTo('home')">
-<span>🏠 回到首页</span>
-</button>
+</div>
+
+<!-- ===== 开发者日志弹窗 ===== -->
+<div id="devLogModal" class="modal" onclick="closeDevLog()">
+<div class="modal-content dev-log-content" onclick="event.stopPropagation()">
+<button class="close-btn" onclick="closeDevLog()">✕</button>
+<h3 class="section-title">📝 开发者日志</h3>
+<div class="video-container">
+<video id="devLogVideo" controls playsinline>
+<source src="videos/devlog.mp4" type="video/mp4">
+您的浏览器不支持视频播放。
+</video>
+<!-- 开发者日志占位 -->
+<div id="devLogVideoPlaceholder" class="video-placeholder small">
+<div class="placeholder-icon">📝</div>
+<p class="placeholder-text">开发者日志制作中...</p>
+<p class="placeholder-sub">敬请期待！🛠️</p>
+</div>
+</div>
 </div>
 </div>
 </section>
+
 <!-- ========== 📸 回忆相册 ========== -->
 <section id="memories" class="page">
 <div class="container">
@@ -205,6 +188,7 @@
 </div>
 </div>
 </section>
+
 <!-- ========== 🎥 祝福视频页 ========== -->
 <section id="video" class="page">
 <div class="container">
@@ -218,6 +202,7 @@
 </div>
 </div>
 </section>
+
 <!-- ========== ✨ 许愿留言板 ========== -->
 <section id="wishes" class="page">
 <div class="container">
@@ -225,12 +210,13 @@
 <h2 class="page-title">✨ 许愿留言板</h2>
 <div class="wish-form">
 <input type="text" id="wishName" placeholder="你的名字" maxlength="20">
-<textarea id="wishText" placeholder="写下对自己新一年的希望与祝福..." maxlength="200"></textarea>
+<textarea id="wishText" placeholder="写下对张梦琳的祝福..." maxlength="200"></textarea>
 <button class="send-btn" onclick="addWish()">💖 发送祝福</button>
 </div>
 <div class="wishes-wall" id="wishWall"></div>
 </div>
 </section>
+
 <!-- ========== 照片弹窗 ========== -->
 <div id="memoryModal" class="modal" onclick="closeMemory()">
 <div class="modal-content" onclick="event.stopPropagation()">
@@ -244,54 +230,12 @@
 </div>
 </div>
 </div>
-<!-- 开发者日志弹窗 -->
-<div id="devLogModal" class="modal" onclick="closeDevLog()">
-<div class="modal-content dev-log-content" onclick="event.stopPropagation()">
-<button class="close-btn" onclick="closeDevLog()">✕</button>
-<h3 class="section-title">📝 开发者日志</h3>
-<div class="video-container">
-<video id="devLogVideo" controls playsinline>
-<source src="videos/devlog.mp4" type="video/mp4">
-您的浏览器不支持视频播放。
-</video>
-<!-- 开发者日志占位 -->
-<div id="devLogVideoPlaceholder" class="video-placeholder small">
-<div class="placeholder-icon">📝</div>
-<p class="placeholder-text">开发者日志制作中...</p>
-<p class="placeholder-sub">敬请期待！🛠️</p>
-</div>
-</div>
-</div>
-</div>
+
+<!-- 背景音乐 -->
 <audio id="bgMusic" loop>
-<source src="BGM.mp3" type="audio/mp3">
+<source src="audio/background.mp3" type="audio/mp3">
 </audio>
-<script>
-document.addEventListener('click', function() {
-var bgMusic = document.getElementById('bgMusic');
-<audio id="bgMusic" loop>
-<source src="BGM.mp3" type="audio/mp3">
-</audio>
-<script>
-document.addEventListener('click', function() {
-var bgMusic = document.getElementById('bgMusic');
-<audio id="bgMusic" loop>
-<source src="BGM.mp3" type="audio/mp3">
-</audio>
-<script>
-document.addEventListener('click', function() {
-var bgMusic = document.getElementById('bgMusic');
-if (bgMusic.paused) {
-bgMusic.play().catch(function(){});
-}
-});
-window.onload = function() {
-var m = document.getElementById('bgMusic');
-m.muted = false;
-m.volume = 1.0;
-setTimeout(function() { m.play().catch(function(){}); }, 1000);
-};
-</script>
+
 <script src="script.js"></script>
 </body>
 </html>
