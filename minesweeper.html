@@ -172,6 +172,13 @@ animation: reviveFlash 0.6s;
 50% { background: #f9e79f; transform: scale(1.1); }
 100% { background: #d4efdf; transform: scale(1); }
 }
+/* 被复活消除的雷标记 */
+.cell.revived-mine {
+background: #ffeef8 !important;
+}
+.revived-mine-icon {
+font-size: 18px;
+}
 /* 数字颜色 */
 .n1 { color: #3498db; }
 .n2 { color: #2ecc71; }
@@ -430,7 +437,7 @@ mines: 30,
 board: [],
 revealed: [],
 flagged: [],
-revived: [],
+revived: [],        // 记录哪些格子被复活过（踩雷后复活的位置）
 firstClick: true,
 gameOver: false,
 won: false,
@@ -443,97 +450,91 @@ revivePending: false,
 reviveTargetR: -1,
 reviveTargetC: -1
 };
-
 // ========== 双击检测（300ms内第二次点击为双击） ==========
 let clickTimer = null;
 let lastClickCell = null;
 let clickCount = 0;
-
 function handleCellClick(r, c, e) {
 if (gameState.gameOver || gameState.revivePending) return;
-
+// 复活过的地方不能点击
+if (gameState.revived[r][c]) return;
 // 如果是双击判断
 if (lastClickCell && lastClickCell.r === r && lastClickCell.c === c && clickCount === 1) {
-    clickCount = 0;
-    lastClickCell = null;
-    clearTimeout(clickTimer);
-    handleDoubleClick(r, c);
-    return;
+clickCount = 0;
+lastClickCell = null;
+clearTimeout(clickTimer);
+handleDoubleClick(r, c);
+return;
 }
-
 // 第一次点击
 clickCount = 1;
 lastClickCell = { r, c };
 clickTimer = setTimeout(() => {
-    clickCount = 0;
-    lastClickCell = null;
+clickCount = 0;
+lastClickCell = null;
 }, 300);
-
 // 执行单击逻辑
 handleClick(r, c);
 }
-
 // ========== 绘制棋盘 ==========
 function renderBoard() {
 const boardEl = document.getElementById('board');
 boardEl.style.gridTemplateColumns = `repeat(${gameState.cols}, 1fr)`;
-
 // 如果是首次渲染，创建所有格子
 if (boardEl.children.length === 0) {
-    for (let r = 0; r < gameState.rows; r++) {
-        for (let c = 0; c < gameState.cols; c++) {
-            const cell = document.createElement('div');
-            cell.className = 'cell hidden';
-            cell.dataset.row = r;
-            cell.dataset.col = c;
-            cell.addEventListener('click', (e) => handleCellClick(r, c, e));
-            cell.addEventListener('contextmenu', (e) => handleRightClick(r, c, e));
-            boardEl.appendChild(cell);
-        }
-    }
+for (let r = 0; r < gameState.rows; r++) {
+for (let c = 0; c < gameState.cols; c++) {
+const cell = document.createElement('div');
+cell.className = 'cell hidden';
+cell.dataset.row = r;
+cell.dataset.col = c;
+cell.addEventListener('click', (e) => handleCellClick(r, c, e));
+cell.addEventListener('contextmenu', (e) => handleRightClick(r, c, e));
+boardEl.appendChild(cell);
 }
-
+}
+}
 // 更新已有格子内容（不重建 DOM）
 const cells = boardEl.children;
 for (let r = 0; r < gameState.rows; r++) {
-    for (let c = 0; c < gameState.cols; c++) {
-        const index = r * gameState.cols + c;
-        const cell = cells[index];
-        const isRevealed = gameState.revealed[r][c];
-        const isFlagged = gameState.flagged[r][c];
-        const isRevived = gameState.revived[r][c];
-
-        // 重置类名（保留复活标记）
-        cell.className = 'cell';
-        cell.classList.add(isRevealed ? 'revealed' : 'hidden');
-        if (isRevived && isRevealed) cell.classList.add('revived');
-
-        // 更新内容
-        if (isRevealed) {
-            if (gameState.board[r][c] === -1) {
-                cell.innerHTML = '💣';
-                cell.classList.add('mine');
-            } else if (gameState.board[r][c] > 0) {
-                cell.innerHTML = gameState.board[r][c];
-                cell.classList.add('n' + gameState.board[r][c]);
-            } else {
-                cell.innerHTML = '';
-            }
-        } else if (isFlagged) {
-            cell.innerHTML = '🚩';
-            cell.classList.add('flag');
-        } else {
-            cell.innerHTML = '';
-        }
-
-        // 更新爆炸效果
-        if (gameState.explodedCell && gameState.explodedCell.r === r && gameState.explodedCell.c === c) {
-            cell.classList.add('exploded');
-        }
-    }
+for (let c = 0; c < gameState.cols; c++) {
+const index = r * gameState.cols + c;
+const cell = cells[index];
+const isRevealed = gameState.revealed[r][c];
+const isFlagged = gameState.flagged[r][c];
+const isRevived = gameState.revived[r][c];
+// 重置类名（保留复活标记）
+cell.className = 'cell';
+cell.classList.add(isRevealed ? 'revealed' : 'hidden');
+// 复活过的格子特殊处理
+if (isRevived) {
+cell.classList.add('revived-mine');
+cell.innerHTML = '💖';
+cell.classList.add('revived-mine-icon');
+} else if (isRevealed) {
+// 更新内容
+if (gameState.board[r][c] === -1) {
+cell.innerHTML = '💣';
+cell.classList.add('mine');
+} else if (gameState.board[r][c] > 0) {
+cell.innerHTML = gameState.board[r][c];
+cell.classList.add('n' + gameState.board[r][c]);
+} else {
+cell.innerHTML = '';
+}
+} else if (isFlagged) {
+cell.innerHTML = '🚩';
+cell.classList.add('flag');
+} else {
+cell.innerHTML = '';
+}
+// 更新爆炸效果
+if (gameState.explodedCell && gameState.explodedCell.r === r && gameState.explodedCell.c === c && !isRevived) {
+cell.classList.add('exploded');
 }
 }
-
+}
+}
 // ========== 初始化游戏 ==========
 function changeDifficulty(diff) {
 const d = DIFFICULTIES[diff];
@@ -541,170 +542,143 @@ gameState.difficulty = diff;
 gameState.cols = d.cols;
 gameState.rows = d.rows;
 gameState.mines = d.mines;
-
 // 更新按钮状态
 document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
 document.querySelector('.diff-btn.' + diff).classList.add('active');
-
 resetGame();
 }
-
 function initBoard() {
 gameState.board = [];
 gameState.revealed = [];
 gameState.flagged = [];
 gameState.revived = [];
-
 for (let r = 0; r < gameState.rows; r++) {
-    gameState.board[r] = [];
-    gameState.revealed[r] = [];
-    gameState.flagged[r] = [];
-    gameState.revived[r] = [];
-    for (let c = 0; c < gameState.cols; c++) {
-        gameState.board[r][c] = 0;
-        gameState.revealed[r][c] = false;
-        gameState.flagged[r][c] = false;
-        gameState.revived[r][c] = false;
-    }
+gameState.board[r] = [];
+gameState.revealed[r] = [];
+gameState.flagged[r] = [];
+gameState.revived[r] = [];
+for (let c = 0; c < gameState.cols; c++) {
+gameState.board[r][c] = 0;
+gameState.revealed[r][c] = false;
+gameState.flagged[r][c] = false;
+gameState.revived[r][c] = false;
 }
 }
-
+}
 function placeMines(safeR, safeC) {
 let placed = 0;
 while (placed < gameState.mines) {
-    const r = Math.floor(Math.random() * gameState.rows);
-    const c = Math.floor(Math.random() * gameState.cols);
-    // 第一下点击的格子及其周围3x3区域不能有雷
-    if (r >= safeR - 1 && r <= safeR + 1 && c >= safeC - 1 && c <= safeC + 1) continue;
-    if (gameState.board[r][c] === -1) continue;
-    gameState.board[r][c] = -1;
-    placed++;
+const r = Math.floor(Math.random() * gameState.rows);
+const c = Math.floor(Math.random() * gameState.cols);
+// 第一下点击的格子及其周围3x3区域不能有雷
+if (r >= safeR - 1 && r <= safeR + 1 && c >= safeC - 1 && c <= safeC + 1) continue;
+if (gameState.board[r][c] === -1) continue;
+gameState.board[r][c] = -1;
+placed++;
 }
 calculateNumbers();
 }
-
 function calculateNumbers() {
 for (let r = 0; r < gameState.rows; r++) {
-    for (let c = 0; c < gameState.cols; c++) {
-        if (gameState.board[r][c] === -1) continue;
-        let count = 0;
-        for (let dr = -1; dr <= 1; dr++) {
-            for (let dc = -1; dc <= 1; dc++) {
-                const nr = r + dr;
-                const nc = c + dc;
-                if (nr >= 0 && nr < gameState.rows && nc >= 0 && nc < gameState.cols && gameState.board[nr][nc] === -1) {
-                    count++;
-                }
-            }
-        }
-        gameState.board[r][c] = count;
-    }
+for (let c = 0; c < gameState.cols; c++) {
+if (gameState.board[r][c] === -1) continue;
+let count = 0;
+for (let dr = -1; dr <= 1; dr++) {
+for (let dc = -1; dc <= 1; dc++) {
+const nr = r + dr;
+const nc = c + dc;
+if (nr >= 0 && nr < gameState.rows && nc >= 0 && nc < gameState.cols && gameState.board[nr][nc] === -1) {
+count++;
 }
 }
-
+}
+gameState.board[r][c] = count;
+}
+}
+}
 // ========== 点击逻辑 ==========
 function handleClick(r, c) {
 if (gameState.gameOver || gameState.revivePending) return;
 if (gameState.flagged[r][c]) return;
 if (gameState.revealed[r][c]) return;
-
+// 复活过的位置不能点
+if (gameState.revived[r][c]) return;
 // 第一下点击
 if (gameState.firstClick) {
-    gameState.firstClick = false;
-    placeMines(r, c);
-    startTimer();
+gameState.firstClick = false;
+placeMines(r, c);
+startTimer();
 }
-
 reveal(r, c);
 checkWin();
 }
-
 function reveal(r, c) {
 if (r < 0 || r >= gameState.rows || c < 0 || c >= gameState.cols) return;
 if (gameState.revealed[r][c]) return;
 if (gameState.flagged[r][c]) return;
 if (gameState.revivePending) return;
-
+if (gameState.revived[r][c]) return;
 gameState.revealed[r][c] = true;
-
 // 踩到地雷
 if (gameState.board[r][c] === -1) {
-    handleMineHit(r, c);
-    return;
+handleMineHit(r, c);
+return;
 }
-
 // 如果数字是0，扩展翻开周围
 if (gameState.board[r][c] === 0) {
-    for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-            if (dr === 0 && dc === 0) continue;
-            reveal(r + dr, c + dc);
-        }
-    }
+for (let dr = -1; dr <= 1; dr++) {
+for (let dc = -1; dc <= 1; dc++) {
+if (dr === 0 && dc === 0) continue;
+reveal(r + dr, c + dc);
 }
-
+}
+}
 renderBoard();
 }
-
 // ========== 踩雷处理 ==========
 function handleMineHit(r, c) {
 gameState.explodedCell = { r, c };
-
 // 还有复活机会，弹出复活选择
 if (gameState.revives > 0 && !gameState.revivePending) {
-    gameState.revivePending = true;
-    gameState.reviveTargetR = r;
-    gameState.reviveTargetC = c;
-    // 冻结游戏（不立即结束）
-    stopTimer();
-    updateFace('😱');
-    // 弹出复活弹窗
-    document.getElementById('reviveDetail').textContent = `你还有 ${gameState.revives} 次复活机会，是否复活？`;
-    document.getElementById('reviveOverlay').classList.add('show');
-    renderBoard();
-    return;
+gameState.revivePending = true;
+gameState.reviveTargetR = r;
+gameState.reviveTargetC = c;
+// 冻结游戏（不立即结束）
+stopTimer();
+updateFace('😱');
+// 弹出复活弹窗
+document.getElementById('reviveDetail').textContent = `你还有 ${gameState.revives} 次复活机会，是否复活？`;
+document.getElementById('reviveOverlay').classList.add('show');
+renderBoard();
+return;
 }
-
 // 没有复活机会，直接游戏结束
 triggerGameOver(false, r, c);
 }
-
 // ========== 复活逻辑 ==========
 function revive() {
 const r = gameState.reviveTargetR;
 const c = gameState.reviveTargetC;
-
 gameState.revivePending = false;
 gameState.revives--;
-
-// 1. 当前踩到的位置变为空格
-gameState.board[r][c] = 0;
+// 1. 在踩雷位置标记为"已复活"（显示💖），雷还在原地（不要移除地雷）
 gameState.revived[r][c] = true;
 gameState.explodedCell = null;
-
-// 2. 重新计算所有数字（只清除当前位置的雷，周围保留）
-calculateNumbers();
-
-// 3. 自动翻开当前位置
-reveal(r, c);
-
-// 4. 恢复游戏
-gameState.gameOver = false;
-gameState.won = false;
-updateFace('😎');
-
-// 5. 重新开始计时（从暂停时继续）
-resumeTimer();
-
-// 6. 更新UI
+// 2. 把它从revealed中拿出来（让它显示💖而不是地雷爆炸）
+gameState.revealed[r][c] = false;
+// 3. 更新UI
 document.getElementById('reviveCount').textContent = gameState.revives;
 document.getElementById('mineCount').textContent = gameState.minesLeft;
 document.getElementById('reviveOverlay').classList.remove('show');
-
+updateFace('😎');
+// 4. 恢复游戏
+gameState.gameOver = false;
+gameState.won = false;
+// 5. 重新开始计时（从暂停时继续）
+resumeTimer();
 renderBoard();
 checkWin();
 }
-
 // 拒绝复活，游戏结束
 function refuseRevive() {
 gameState.revivePending = false;
@@ -713,143 +687,132 @@ document.getElementById('reviveOverlay').classList.remove('show');
 resumeTimer();
 triggerGameOver(false, gameState.reviveTargetR, gameState.reviveTargetC);
 }
-
 // ========== 游戏结束触发 ==========
 function triggerGameOver(won, explodedR, explodedC) {
 // 防止重复触发
 if (gameState.gameOver) return;
-
 gameState.explodedCell = (won || typeof explodedR === 'undefined') ? null : {r: explodedR, c: explodedC};
 gameState.gameOver = true;
 gameState.won = won;
 stopTimer();
-
 if (won) {
-    updateFace('😎');
-    document.getElementById('overEmoji').textContent = '🎉';
-    document.getElementById('overTitle').textContent = '恭喜通关！';
+updateFace('😎');
+document.getElementById('overEmoji').textContent = '🎉';
+document.getElementById('overTitle').textContent = '恭喜通关！';
 } else {
-    updateFace('😵');
-    document.getElementById('overEmoji').textContent = '💥';
-    document.getElementById('overTitle').textContent = '踩到雷了！';
-    // 显示所有地雷
-    for (let r = 0; r < gameState.rows; r++) {
-        for (let c = 0; c < gameState.cols; c++) {
-            if (gameState.board[r][c] === -1) {
-                gameState.revealed[r][c] = true;
-            }
-        }
-    }
+updateFace('😵');
+document.getElementById('overEmoji').textContent = '💥';
+document.getElementById('overTitle').textContent = '踩到雷了！';
+// 显示所有未复活的地雷
+for (let r = 0; r < gameState.rows; r++) {
+for (let c = 0; c < gameState.cols; c++) {
+if (gameState.board[r][c] === -1 && !gameState.revived[r][c]) {
+gameState.revealed[r][c] = true;
+}
+}
+}
 }
 renderBoard();
-
 document.getElementById('overDetail').textContent = `用时: ${gameState.time}秒 | 雷数: ${gameState.mines} | 复活: ${MAX_REVIVES - gameState.revives}次`;
 document.getElementById('gameOverOverlay').classList.add('show');
 }
-
 // ========== 计时器 ==========
 function startTimer() {
 stopTimer();
 gameState.time = 0;
 gameState.timerInterval = setInterval(() => {
-    gameState.time++;
-    document.getElementById('timeCount').textContent = gameState.time;
-    if (gameState.time >= 999) stopTimer();
+gameState.time++;
+document.getElementById('timeCount').textContent = gameState.time;
+if (gameState.time >= 999) stopTimer();
 }, 1000);
 }
-
 function resumeTimer() {
 if (!gameState.timerInterval) {
-    gameState.timerInterval = setInterval(() => {
-        gameState.time++;
-        document.getElementById('timeCount').textContent = gameState.time;
-        if (gameState.time >= 999) stopTimer();
-    }, 1000);
+gameState.timerInterval = setInterval(() => {
+gameState.time++;
+document.getElementById('timeCount').textContent = gameState.time;
+if (gameState.time >= 999) stopTimer();
+}, 1000);
 }
 }
-
 function stopTimer() {
 if (gameState.timerInterval) {
-    clearInterval(gameState.timerInterval);
-    gameState.timerInterval = null;
+clearInterval(gameState.timerInterval);
+gameState.timerInterval = null;
 }
 }
-
 // ========== 右键标记 ==========
 function handleRightClick(r, c, e) {
 e.preventDefault();
 if (gameState.gameOver || gameState.revivePending) return;
 if (gameState.revealed[r][c]) return;
-
+// 复活过的不能标记
+if (gameState.revived[r][c]) return;
 if (gameState.flagged[r][c]) {
-    gameState.flagged[r][c] = false;
-    gameState.minesLeft++;
+gameState.flagged[r][c] = false;
+gameState.minesLeft++;
 } else {
-    gameState.flagged[r][c] = true;
-    gameState.minesLeft--;
+gameState.flagged[r][c] = true;
+gameState.minesLeft--;
 }
-
 document.getElementById('mineCount').textContent = gameState.minesLeft;
 updateFace('😊');
 renderBoard();
 }
-
 // ========== 双击数字 ==========
 function handleDoubleClick(r, c) {
 if (gameState.gameOver || gameState.revivePending) return;
 if (!gameState.revealed[r][c]) return;
 if (gameState.board[r][c] <= 0) return;
-
 const num = gameState.board[r][c];
 let flagCount = 0;
 const neighbors = [];
-
 for (let dr = -1; dr <= 1; dr++) {
-    for (let dc = -1; dc <= 1; dc++) {
-        const nr = r + dr;
-        const nc = c + dc;
-        if (nr >= 0 && nr < gameState.rows && nc >= 0 && nc < gameState.cols) {
-            if (gameState.flagged[nr][nc]) flagCount++;
-            if (!gameState.flagged[nr][nc] && !gameState.revealed[nr][nc]) {
-                neighbors.push({r: nr, c: nc});
-            }
-        }
-    }
+for (let dc = -1; dc <= 1; dc++) {
+const nr = r + dr;
+const nc = c + dc;
+if (nr >= 0 && nr < gameState.rows && nc >= 0 && nc < gameState.cols) {
+// 复活过的位置算已处理（相当于旗子）
+if (gameState.revived[nr][nc]) {
+flagCount++;
+continue;
 }
-
+if (gameState.flagged[nr][nc]) flagCount++;
+if (!gameState.flagged[nr][nc] && !gameState.revealed[nr][nc]) {
+neighbors.push({r: nr, c: nc});
+}
+}
+}
+}
 // 如果标记的旗数等于数字，翻开周围未标记的格子
 if (flagCount === num) {
-    const mineNeighbor = neighbors.find(n => gameState.board[n.r][n.c] === -1);
-    if (mineNeighbor) {
-        // 踩雷，交给handleMineHit处理（支持复活）
-        handleMineHit(mineNeighbor.r, mineNeighbor.c);
-    } else {
-        for (const n of neighbors) {
-            reveal(n.r, n.c);
-        }
-        checkWin();
-    }
+const mineNeighbor = neighbors.find(n => gameState.board[n.r][n.c] === -1);
+if (mineNeighbor) {
+// 踩雷，交给handleMineHit处理（支持复活）
+handleMineHit(mineNeighbor.r, mineNeighbor.c);
+} else {
+for (const n of neighbors) {
+reveal(n.r, n.c);
+}
+checkWin();
 }
 }
-
+}
 // ========== 检查胜利 ==========
 function checkWin() {
 if (gameState.gameOver || gameState.revivePending) return;
-
-let revealedCount = 0;
+// 所有非地雷的格子都翻开了 = 胜利
+// 被复活消掉的地雷也算处理了
 for (let r = 0; r < gameState.rows; r++) {
-    for (let c = 0; c < gameState.cols; c++) {
-        if (gameState.revealed[r][c]) revealedCount++;
-    }
-}
-
-const totalCells = gameState.rows * gameState.cols;
-const correctCells = totalCells - gameState.mines;
-if (revealedCount === correctCells) {
-    triggerGameOver(true);
+for (let c = 0; c < gameState.cols; c++) {
+if (gameState.board[r][c] !== -1 && !gameState.revealed[r][c]) {
+return; // 还有未翻开的非雷格子
 }
 }
-
+}
+// 所有非雷格子都翻开了，胜利！
+triggerGameOver(true);
+}
 // ========== 重置游戏 ==========
 function resetGame() {
 stopTimer();
@@ -863,27 +826,22 @@ gameState.revives = MAX_REVIVES;
 gameState.revivePending = false;
 gameState.reviveTargetR = -1;
 gameState.reviveTargetC = -1;
-
 document.getElementById('mineCount').textContent = gameState.mines;
 document.getElementById('timeCount').textContent = '0';
 document.getElementById('reviveCount').textContent = gameState.revives;
 document.getElementById('gameOverOverlay').classList.remove('show');
 document.getElementById('reviveOverlay').classList.remove('show');
 updateFace('😊');
-
 // 清空棋盘容器（重新创建DOM，因为棋盘大小可能改变）
 const boardEl = document.getElementById('board');
 boardEl.innerHTML = '';
-
 initBoard();
 renderBoard();
 }
-
 // ========== 更新表情 ==========
 function updateFace(emoji) {
 document.getElementById('faceBtn').textContent = emoji;
 }
-
 // ========== 启动 ==========
 resetGame();
 </script>
